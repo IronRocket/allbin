@@ -113,9 +113,11 @@ export class Message {
         expirationDateISO: "",
       };
     }
+    
     redirect(id: string) {
       window.location.href = "/grab?id=" + encodeURIComponent(id);
     }
+
     async uploadFile(id: string, token: string) {
       let blob: Blob;
       if (this.isEncrypted) {
