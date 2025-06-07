@@ -1,0 +1,9 @@
+.parcel-cache/
+.gitOld/
+dist/
+node_modules/
+assets/
+fileDatabase/
+logs/
+database.db
+dev.sh

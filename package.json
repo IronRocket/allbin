@@ -1,0 +1,47 @@
+{
+  "name": "parcel-vanilla-starter",
+  "private": true,
+  "version": "0.0.0",
+  "targets": {
+    "enter": {
+      "publicUrl": "/",
+      "source": "src/index.html"
+    },
+    "grab": {
+      "publicUrl": "/grab",
+      "source": "grab/index.html"
+    }
+  },
+  "scripts": {
+    "dev": "parcel serve",
+    "build": "parcel build --no-content-hash"
+  },
+  "devDependencies": {
+    "assert": "^2.1.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
+    "events": "^3.3.0",
+    "os-browserify": "^0.3.0",
+    "parcel": "^2.14.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "string_decoder": "^1.3.0",
+    "svgo": "^3.3.2",
+    "typescript": "^5.8.3",
+    "util": "^0.12.5",
+    "vm-browserify": "^1.1.2"
+  },
+  "dependencies": {
+    "argon2-browser": "^1.18.0",
+    "dayjs": "^1.11.13",
+    "tus-js-client": "^4.3.1"
+  },
+  "compressors": {
+    "*.{html,css,js,svg,map}": [
+      "...",
+      "@parcel/compressor-gzip",
+      "@parcel/compressor-brotli"
+    ]
+  }
+}

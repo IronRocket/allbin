@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="./styles.css" rel="stylesheet" />
+        <title>Hide and Seek</title>
+    </head>
+    <body>
+        <div>
+            <h1>Dimension</h1>
+            <div class="container">
+                <h3 style="grid-column: 1">Expires in:</h3>
+                <select id="expiry" name="expiry">
+                    <option value="PT1H">1 Hour</option>
+                    <option value="P1D" selected="">1 Day</option>
+                    <option value="P7D">1 Week</option>
+                    <option value="P1M">1 Month</option>
+                    <option value="P3M">3 Months</option>
+                </select>
+
+                <div>
+                    <label>Download Count Limit</label>
+                    <input
+                        type="number"
+                        id="downloadLimit"
+                        min="1"
+                        class="download-input"
+                        disabled="true"
+                    />
+                    <label class="switch">
+                        <input
+                            type="checkbox"
+                            id="unlimitedCheckbox"
+                            checked=""
+                        />
+                        <span class="slider"></span>
+                        <span class="label-text">Unlimited</span>
+                    </label>
+                </div>
+
+                <h3 style="grid-column: 1">Visibility:</h3>
+                <label for="public"
+                    ><input
+                        type="radio"
+                        id="visibility"
+                        name="visibility"
+                        value="true"
+                    />Public</label
+                >
+                <label for="unlisted"
+                    ><input
+                        type="radio"
+                        name="visibility"
+                        value="false"
+                        checked=""
+                    />Unlisted</label
+                >
+
+                <h3 style="grid-column: 1">Title(optional):</h3>
+                <input
+                    type="text"
+                    id="title"
+                    placeholder="Title"
+                    maxlength="255"
+                />
+
+                <h3 style="grid-column: 1">Password(optional):</h3>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="password"
+                    maxlength="255"
+                />
+
+                <textarea
+                    id="content"
+                    placeholder="Paste your text here..."
+                    style="grid-column: span 6"
+                ></textarea>
+                <input type="file" id="fileInput" />
+                <h3 id="empty">Textbox is empty</h3>
+                <button class="submit-btn" id="submit">Submit</button>
+            </div>
+        </div>
+
+        <div id="publicList">
+            <div class="listTitle">
+                <h1>Public Dimensions</h1>
+                <button id="refresh"><svg id="svgRefresh" width="2.2em" height="2.2em" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M27.1 14.313V5.396L24.158 8.34c-2.33-2.325-5.033-3.503-8.11-3.503C9.902 4.837 4.901 9.847 4.899 16c.001 6.152 5.003 11.158 11.15 11.16 4.276 0 9.369-2.227 10.836-8.478l.028-.122h-3.23l-.022.068c-1.078 3.242-4.138 5.421-7.613 5.421a8 8 0 0 1-5.691-2.359A7.993 7.993 0 0 1 8 16.001c0-4.438 3.611-8.049 8.05-8.049 2.069 0 3.638.58 5.924 2.573l-3.792 3.789H27.1z"/></svg></button>
+            </div>
+            
+            <div id="searchWrapper"><input type="search" placeholder="search..."/></div>
+            <ol id="list"></ol>
+            
+            <div id="pageSelector">
+                <button class="selector" id="left"><svg width="2.2em" height="2.2em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="24" height="24" fill="none"/>
+                    <path d="M14.5 17L9.5 12L14.5 7" stroke="#00d1b2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg></button>
+                <h2 id="page">0</h2>
+                <button class="selector" id="right"><svg width="2.2em" height="2.2em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="24" height="24" fill="none"/>
+                    <path d="M9.5 7L14.5 12L9.5 17" stroke="#00d1b2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg></button>
+            </div>
+
+            
+        </div>
+    </body>
+    <script type="module" src="app.ts"></script>
+</html>

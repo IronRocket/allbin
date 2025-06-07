@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Dimension</title>
+        <link href="/grab/style.css" rel="stylesheet" />
+    </head>
+    <body>
+        <div class="modal-overlay" id="passwordModal">
+            <div class="modal">
+                <h2>Enter Password</h2>
+                <input type="password" id="password" placeholder="Password" />
+                <button id="submit">Submit</button>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Dimension</h2>
+
+            <div class="info-group">
+                <span class="label">Content:</span>
+                <span id="data" class="value"></span>
+            </div>
+
+            <div class="info-group">
+                <span class="label">Downloaded:</span>
+                <span id="reads" class="value"></span>
+            </div>
+
+            <div class="info-group">
+                <span class="label">Expiration Date:</span>
+                <span id="expirationDate" class="value"></span>
+            </div>
+        </div>
+        <div id="fileCard" class="card">
+            <h2>File</h2>
+            <button id="downloadBtn"></button>
+        </div>
+    </body>
+    <script type="module" src="script.ts"></script>
+</html>

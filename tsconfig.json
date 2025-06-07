@@ -1,0 +1,16 @@
+{
+    "include": ["src"],
+    "compilerOptions": {
+        "target": "ES2020",                // or "ES2017", "ESNext"
+        "module": "ESNext",                // Let Parcel handle module bundling
+        "lib": ["ES2020", "DOM"],          // Make sure Promise, fetch, crypto, etc., are available
+        "esModuleInterop": true,           // So you can use default imports like `import dayjs from 'dayjs'`
+        "strict": true,                    // Enable strict typing (optional but recommended)
+        "moduleResolution": "Node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "skipLibCheck": true,
+        "allowSyntheticDefaultImports": true,
+    }
+    
+}
