@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
@@ -13,6 +14,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -318,29 +320,9 @@ func enter(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func killhumanily() {
-	fmt.Println("fafdsaf")
-}
-
-func inputHandler() {
-
-	commandHelp := `
-		q	softly kill webapp
-		h	give this help list
-	`
-	fmt.Print(commandHelp)
-	var z string = ""
-	for {
-		fmt.Scan(&z)
-
-		if z == "q" {
-			killhumanily()
-		}
-	}
-}
-
 func main() {
 	var err error
+
 	tmpl, err = template.ParseFiles("./dist/grab/index.html")
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to parse template")
@@ -414,8 +396,29 @@ func main() {
 		}
 	}()
 
-	err = http.ListenAndServe(":"+PORT, nil)
-	if err != nil {
-		logger.Fatal().Err(err).Msgf("failed to open http on port=%s", PORT)
+	server := &http.Server{
+		Addr:    ":" + PORT,
+		Handler: nil, // or use your own mux/router
+	}
+
+	// Handle OS interrupt (Ctrl+C)
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt)
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil {
+			logger.Fatal().Err(err).Msgf("failed to open http on port=%s", PORT)
+		}
+	}()
+
+	fmt.Println("Shutting down server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		logger.Err(err).Msg("Graceful shutdown failed")
+	} else {
+		logger.Info().Msg("Server gracefully stopped")
 	}
 }
