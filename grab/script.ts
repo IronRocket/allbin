@@ -17,7 +17,7 @@ interface Dimension {
 let password: string;
 
 async function decryptFile(dimension: Dimension) {
-  let linkHref = "/files/" + dimension["FilePath"];
+  let linkHref = "/files/" + dimension["id"];
   if (dimension["encrypted"]) {
     const response = await fetch(linkHref);
     if (!response.ok) throw new Error("Failed to download file");

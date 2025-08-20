@@ -119,6 +119,49 @@ func decrypt(key *rsa.PrivateKey, encrypted []byte) []byte {
 	return decrypted
 }
 
+func generateRSAKey() {
+
+	if _, err := os.Stat("./assets"); os.IsNotExist(err) {
+		err := os.Mkdir("./assets", 0700)
+		if err != nil {
+			logger.Fatal().Err(err).Msg("failed to create assets directory")
+		}
+	}
+
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		panic(err)
+	}
+
+	publicKey = &privateKey.PublicKey
+
+	privKB := x509.MarshalPKCS1PrivateKey(privateKey)
+	privateKeyPem = pem.EncodeToMemory(&pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: privKB,
+	})
+	err = os.WriteFile("./assets/private.pem", privateKeyPem, 0644)
+	if err != nil {
+		logger.Fatal().Msg("Failed to write to /assets/private.pem")
+		panic(err)
+	}
+
+	pubKB, err := x509.MarshalPKIXPublicKey(publicKey)
+	if err != nil {
+		logger.Fatal().Msg("Failed to convert public key to PHIX")
+		panic(err)
+	}
+	publicKeyPEM = pem.EncodeToMemory(&pem.Block{
+		Type:  "RSA PUBLIC KEY",
+		Bytes: pubKB,
+	})
+	err = os.WriteFile("./assets/public.pem", publicKeyPEM, 0644)
+	if err != nil {
+		logger.Fatal().Msg("Failed to write to /assets/public.pem")
+		panic(err)
+	}
+}
+
 func setupEncryption() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -129,38 +172,8 @@ func setupEncryption() {
 	authentication = os.Getenv("authentication")
 	publicKeyPEM, err = os.ReadFile("./assets/public.pem")
 	if err != nil {
-		privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
-		if err != nil {
-			panic(err)
-		}
-
-		publicKey = &privateKey.PublicKey
-
-		privKB := x509.MarshalPKCS1PrivateKey(privateKey)
-		privateKeyPem = pem.EncodeToMemory(&pem.Block{
-			Type:  "RSA PRIVATE KEY",
-			Bytes: privKB,
-		})
-		err = os.WriteFile("./assets/private.pem", privateKeyPem, 0644)
-		if err != nil {
-			logger.Fatal().Msg("Failed to write to /assets/private.pem")
-			panic(err)
-		}
-
-		pubKB, err := x509.MarshalPKIXPublicKey(publicKey)
-		if err != nil {
-			logger.Fatal().Msg("Failed to convert public key to PHIX")
-			panic(err)
-		}
-		publicKeyPEM = pem.EncodeToMemory(&pem.Block{
-			Type:  "RSA PUBLIC KEY",
-			Bytes: pubKB,
-		})
-		err = os.WriteFile("./assets/public.pem", publicKeyPEM, 0644)
-		if err != nil {
-			logger.Fatal().Msg("Failed to write to /assets/public.pem")
-			panic(err)
-		}
+		generateRSAKey()
+		logger.Info().Msg("Public key not found generating new RSA pair")
 	} else {
 		privateKeyPem, err = os.ReadFile("./assets/private.pem")
 		if err != nil {

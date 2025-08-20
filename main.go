@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"crypto/rsa"
 	"encoding/base64"
 	"encoding/json"
@@ -14,9 +13,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"os/exec"
-	"os/signal"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/google/uuid"
@@ -24,7 +21,6 @@ import (
 )
 
 const PORT = "5000"
-const DEV = true
 
 var kill = false
 
@@ -202,10 +198,9 @@ func grabApi(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if exists {
-		fmt.Println(dim)
-
 		dim.Visibility = visibility
 		dim.ExpirationDateISO = prettyDate(dim.ExpirationDate)
+		dim.Id = id
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(dim)
 	} else {
@@ -213,23 +208,6 @@ func grabApi(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Info().Str("dimension-id", id).Msg(prefix + " request")
-}
-
-func buildWebsite() {
-	dist := exec.Command("rm", "-rf", "./dist")
-	if err := dist.Run(); err != nil {
-		logger.
-			Fatal().Err(err).
-			Msg("failed to remove old website production folder, command: " + strings.Join(dist.Args, " "))
-	}
-
-	build := exec.Command("npm", "run", "build")
-
-	if err := build.Run(); err != nil {
-		logger.
-			Fatal().Err(err).
-			Msg("failed to build production website, command: " + strings.Join(build.Args, " "))
-	}
 }
 
 func filefinder(path string) Page {
@@ -328,7 +306,6 @@ func main() {
 		logger.Fatal().Err(err).Msg("Failed to parse template")
 	}
 
-	runtime.GOMAXPROCS(2)
 	UPLOAD_TOKEN = uuid.New().String()
 	logger = log.Logger{
 		Level:      log.InfoLevel,
@@ -356,8 +333,6 @@ func main() {
 		},
 	}
 
-	buildWebsite() // rm -rf ./dist && npm run build
-
 	// find all files in ./dist and load them into memory
 	enterPage = filefinder("./dist/enter/")
 	grabPage = filefinder("./dist/grab/")
@@ -367,17 +342,8 @@ func main() {
 	initFileUploader() // tus protocol
 	go publicHandler()
 
-	if DEV {
-		enterDev := http.FileServer(http.Dir("./dist/enter"))
-		http.Handle("/", enterDev)
-
-		grabDev := http.FileServer(http.Dir("./dist/grab"))
-		http.Handle("/grab/", http.StripPrefix("/grab/", grabDev))
-	} else {
-		http.HandleFunc("/", enter)
-		http.HandleFunc("/grab/", grab)
-	}
-
+	http.HandleFunc("/", enter)
+	http.HandleFunc("/grab/", grab)
 	http.HandleFunc("/public/", getPublicKey)
 
 	http.HandleFunc("/api/enter", enterApi)
@@ -389,6 +355,7 @@ func main() {
 
 	fmt.Println("http://localhost:" + PORT)
 
+	// Debug http server
 	go func() {
 		err := http.ListenAndServe("localhost:6060", nil)
 		if err != nil {
@@ -401,24 +368,7 @@ func main() {
 		Handler: nil, // or use your own mux/router
 	}
 
-	// Handle OS interrupt (Ctrl+C)
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt)
-
-	go func() {
-		if err := server.ListenAndServe(); err != nil {
-			logger.Fatal().Err(err).Msgf("failed to open http on port=%s", PORT)
-		}
-	}()
-
-	fmt.Println("Shutting down server...")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		logger.Err(err).Msg("Graceful shutdown failed")
-	} else {
-		logger.Info().Msg("Server gracefully stopped")
+	if err := server.ListenAndServe(); err != nil {
+		logger.Fatal().Err(err).Msgf("failed to open http on port=%s", PORT)
 	}
 }
